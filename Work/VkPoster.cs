@@ -32,11 +32,10 @@ public class VkPoster
 
         logger.LogInformation("Постим.");
 
-        VkApi api = new();
+        using VkApi api = new();
 
         await api.AuthorizeAsync(new ApiAuthParams
         {
-            ApplicationId = options.Value.VkClientId,
             AccessToken = options.Value.Auth.AccessToken,
             Settings = VkNet.Enums.Filters.Settings.Wall
         });
