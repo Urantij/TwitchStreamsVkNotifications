@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
@@ -50,6 +51,36 @@ public class MainRoute
             expireText = $"Всё закончится {endOfTheLife:dd:MM:yyyy HH:mm:ss} (UTC)";
         }
 
-        return TypedResults.Ok($"Всё есть как есть. {expireText}");
+        return TypedResults.Content(
+            $$"""
+            <!DOCTYPE html>
+            <html>
+
+            <head>
+                <title>я юра</title>
+                <script>
+                    function reset()
+                    {
+                        fetch("{{new Uri(options.Value.ServerUrl, "setup")}}",
+                            {
+                                method: "DELETE"
+                            })
+                            .then(response => {
+                                window.location.href = "{{options.Value.ServerUrl}}";
+                            })
+                            .catch(reason => {
+                                console.log(reason);
+                            });
+                    }
+                </script>
+            </head>
+
+            <body>
+                Всё есть как есть. {{expireText}}<br/>
+                <button onclick="reset()">Сбросить</button>
+            </body>
+
+            </html>
+            """, contentType: "text/html", Encoding.UTF8);
     }
 }

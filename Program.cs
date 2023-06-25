@@ -40,7 +40,8 @@ var app = builder.Build();
 
 app.MapGet("/", MainRoute.GetAsync);
 app.MapGet("/redirect", RedirectRoute.GetAsync);
-app.MapPost("/redirect", RedirectRoute.PostAsync);
+app.MapPost("/setup", SetupRoute.PostAsync);
+app.MapDelete("/setup", SetupRoute.DeleteAsync);
 
 using (var scope = app.Services.CreateScope())
 {

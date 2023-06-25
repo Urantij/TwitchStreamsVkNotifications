@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+    <script>
+        function reset()
+        {
+            fetch("url/setup",
+                {
+                    method: "DELETE"
+                })
+                .then(response => {
+                    window.location.href = "url";
+                })
+                .catch(reason => {
+                    console.log(reason);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <button onclick="reset()">Сбросить</button>
+</body>
+
+</html>
