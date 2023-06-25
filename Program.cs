@@ -36,6 +36,12 @@ builder.Services.AddOptions<MyOptions>()
 builder.Services.AddScoped<VkPoster>();
 builder.Services.AddSingleton<TwitchChecker>();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddSimpleConsole(c =>
+{
+    c.TimestampFormat = "[HH:mm:ss] ";
+});
+
 var app = builder.Build();
 
 app.MapGet("/", MainRoute.GetAsync);
