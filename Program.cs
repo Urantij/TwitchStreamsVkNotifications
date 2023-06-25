@@ -46,6 +46,12 @@ using (var scope = app.Services.CreateScope())
 {
     var checker = scope.ServiceProvider.GetRequiredService<TwitchChecker>();
     checker.Init();
+
+    if (args.Contains("--test"))
+    {
+        var vk = scope.ServiceProvider.GetRequiredService<VkPoster>();
+        await vk.PostAsync();
+    }
 }
 
 app.Run();
