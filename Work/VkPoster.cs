@@ -46,8 +46,8 @@ public class VkPoster
             Guid = Guid.NewGuid().ToString(),
 
             OwnerId = options.Value.VkOwnerId,
-            FromGroup = true,
-            Signed = false,
+            FromGroup = options.Value.VkOwnerId < 0 ? true : null,
+            Signed = options.Value.VkOwnerId < 0 ? false : null,
             Message = options.Value.VkPostMessage,
         });
 
