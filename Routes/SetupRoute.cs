@@ -11,7 +11,7 @@ namespace TwitchStreamsVkNotifications.Routes;
 
 public class SetupRoute
 {
-    public static async Task<IResult> PostAsync(HttpContext httpContext, IOptions<MyOptions> options, ILogger<RedirectRoute> logger)
+    public static async Task<IResult> PostAsync(HttpContext httpContext, IOptions<MyOptions> options, ILogger<SetupRoute> logger)
     {
         using MemoryStream ms = new();
 

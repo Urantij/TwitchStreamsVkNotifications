@@ -11,8 +11,10 @@ namespace TwitchStreamsVkNotifications.Routes;
 /// </summary>
 public class RedirectRoute
 {
-    public static IResult GetAsync(IOptions<MyOptions> options)
+    public static IResult GetAsync(IOptions<MyOptions> options, ILogger<RedirectRoute> logger)
     {
+        logger.LogInformation("Получили.");
+
         return TypedResults.Content(
             $$"""
             <!DOCTYPE html>
