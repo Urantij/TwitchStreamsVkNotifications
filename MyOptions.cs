@@ -7,12 +7,9 @@ namespace TwitchStreamsVkNotifications;
 
 public class MyOptions
 {
-    public required Uri ServerUrl { get; set; }
-
     public required string TwitchChannelId { get; set; }
 
     public required ulong VkClientId { get; set; }
-    public required Uri VkRedirectUri { get; set; }
     public required long VkOwnerId { get; set; }
     public required string VkPostMessage { get; set; }
 

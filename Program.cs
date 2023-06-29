@@ -2,7 +2,6 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Options;
 using TwitchStreamsVkNotifications;
-using TwitchStreamsVkNotifications.Routes;
 using TwitchStreamsVkNotifications.Work;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,12 +41,11 @@ builder.Logging.AddSimpleConsole(c =>
     c.TimestampFormat = "[HH:mm:ss] ";
 });
 
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
-app.MapGet("/", MainRoute.GetAsync);
-app.MapGet("/redirect", RedirectRoute.GetAsync);
-app.MapPost("/setup", SetupRoute.PostAsync);
-app.MapDelete("/setup", SetupRoute.DeleteAsync);
+app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {

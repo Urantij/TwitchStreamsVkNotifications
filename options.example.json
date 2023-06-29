@@ -1,8 +1,6 @@
 {
-    "ServerUrl": "https://адрес:порт",
     "TwitchChannelId": 1, //Можно узнать тут https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
     "VkClientId": 2, // ID приложения
-    "VkRedirectUri": "https://адрес:порт/redirect",
     "VkOwnerId": -2,  // Если указан айди группы, нужно добавить минус https://regvk.com/id/
     "VkPostMessage": "Ого, стрим!"
 }

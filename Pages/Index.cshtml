@@ -1,0 +1,29 @@
+@page
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model TwitchStreamsVkNotifications.Pages.IndexModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    @if (Model.HasAuth)
+    {
+        <span>Данные уже есть.</span>
+        <br />
+
+        <form method="post">
+            <button asp-page-handler="Delete">Сбросить</button>
+        </form>
+        <br />
+    }
+
+    <button type="button" onclick="window.open('@Model.RedirectUrl');">Авторизоваться</button>
+    <br />
+
+    <form method="post">
+        <input asp-for="Text"></input>
+        <button type="submit">Отправить</button>
+    </form>
+</div>
