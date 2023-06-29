@@ -1,5 +1,5 @@
 {
-    "TwitchChannelId": 1, //Можно узнать тут https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
+    "TwitchChannelId": "1", //Можно узнать тут https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
     "VkClientId": 2, // ID приложения
     "VkOwnerId": -2,  // Если указан айди группы, нужно добавить минус https://regvk.com/id/
     "VkPostMessage": "Ого, стрим!"
