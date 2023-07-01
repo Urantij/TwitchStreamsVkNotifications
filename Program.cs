@@ -1,27 +1,37 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Options;
 using TwitchStreamsVkNotifications;
 using TwitchStreamsVkNotifications.Work;
 
 var builder = WebApplication.CreateBuilder(args);
 
 {
-    builder.Services.Configure<KestrelServerOptions>(serverOptions =>
+    string? certBasePath = builder.Configuration.GetConnectionString("CertPath");
+
+    if (certBasePath != null)
     {
-        serverOptions.ConfigureHttpsDefaults(options =>
+        string certPath = Path.Combine(certBasePath, "fullchain.pem");
+        string keyPath = Path.Combine(certBasePath, "privkey.pem");
+
+        if (File.Exists(certPath) && File.Exists(keyPath))
         {
-            string? certBasePath = builder.Configuration.GetConnectionString("CertPath") ?? throw new Exception("Нет пути до сертификатов.");
-
-            string certPath = Path.Combine(certBasePath, "fullchain.pem");
-            string keyPath = Path.Combine(certBasePath, "privkey.pem");
-
-            if (!File.Exists(certPath) || !File.Exists(keyPath))
-                throw new Exception("Нет сертификатов.");
-
-            options.ServerCertificate = X509Certificate2.CreateFromPemFile(certPath, keyPath);
-        });
-    });
+            builder.Services.Configure<KestrelServerOptions>(serverOptions =>
+                {
+                    serverOptions.ConfigureHttpsDefaults(options =>
+                    {
+                        options.ServerCertificate = X509Certificate2.CreateFromPemFile(certPath, keyPath);
+                    });
+                });
+        }
+        else
+        {
+            System.Console.WriteLine("Сертификат не найден.");
+        }
+    }
+    else
+    {
+        System.Console.WriteLine("Сертификат не используется.");
+    }
 }
 
 var configBuilder = new ConfigurationBuilder();
