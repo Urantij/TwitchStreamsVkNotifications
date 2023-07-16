@@ -34,6 +34,8 @@ public class TwitchChecker : IDisposable
         pubsubClient = new TwitchPubsubClient(new TwitchPubsubClientOpts()
         {
         }, loggerFactory);
+        pubsubClient.Connected += ClientConnected;
+        pubsubClient.ConnectionClosed += ClientConnectionClosed;
 
         var topic = pubsubClient.AddPlaybackTopic(options.Value.TwitchChannelId);
         topic.DataReceived = PlaybackReceived;
@@ -81,6 +83,16 @@ public class TwitchChecker : IDisposable
         {
             logger.LogError(e, "Ошибка при обработке информации.");
         }
+    }
+
+    private void ClientConnected()
+    {
+        logger.LogInformation("Клиент присоединился.");
+    }
+
+    private void ClientConnectionClosed(Exception? exception)
+    {
+        logger.LogInformation("Клиент потерял соединение. {message}", exception?.Message);
     }
 
     public void Dispose()
