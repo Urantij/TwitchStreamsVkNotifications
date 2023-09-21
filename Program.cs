@@ -2,6 +2,9 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using TwitchStreamsVkNotifications;
 using TwitchStreamsVkNotifications.Work;
+using TwitchStreamsVkNotifications.Work.Check;
+using TwitchStreamsVkNotifications.Work.Check.Helix;
+using TwitchStreamsVkNotifications.Work.Check.Pubsub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +46,26 @@ builder.Services.AddOptions<MyOptions>()
 .ValidateOnStart();
 
 builder.Services.AddScoped<VkPoster>();
-builder.Services.AddSingleton<TwitchChecker>();
+
+builder.Services.AddSingleton<PubsubChecker>();
+builder.Services.AddSingleton<IHostedService, PubsubChecker>(p => p.GetRequiredService<PubsubChecker>());
+builder.Services.AddSingleton<ITwitchChecker, PubsubChecker>(p => p.GetRequiredService<PubsubChecker>());
+
+if (config.GetSection("Twitch").GetChildren().Any(c => c.Key == "Helix"))
+{
+    System.Console.WriteLine("Хеликс добавлен.");
+
+    builder.Services.AddOptions<HelixConfig>()
+    .Bind(config.GetSection("Twitch").GetSection("Helix"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+    builder.Services.AddSingleton<HelixChecker>();
+    builder.Services.AddSingleton<IHostedService, HelixChecker>(p => p.GetRequiredService<HelixChecker>());
+    builder.Services.AddSingleton<ITwitchChecker, HelixChecker>(p => p.GetRequiredService<HelixChecker>());
+}
+
+builder.Services.AddSingleton<IHostedService, TwitchChecker>();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSimpleConsole(c =>
@@ -59,9 +81,6 @@ app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
-    var checker = scope.ServiceProvider.GetRequiredService<TwitchChecker>();
-    checker.Init();
-
     if (args.Contains("--test"))
     {
         var vk = scope.ServiceProvider.GetRequiredService<VkPoster>();

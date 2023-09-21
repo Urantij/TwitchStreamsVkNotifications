@@ -40,7 +40,7 @@ public class VkPoster
             Settings = VkNet.Enums.Filters.Settings.Wall
         });
 
-        await api.Wall.PostAsync(new VkNet.Model.RequestParams.WallPostParams()
+        await api.Wall.PostAsync(new WallPostParams()
         {
             Guid = Guid.NewGuid().ToString(),
 

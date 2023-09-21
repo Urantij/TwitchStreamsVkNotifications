@@ -5,98 +5,83 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using TwitchSimpleLib.Pubsub;
 using TwitchSimpleLib.Pubsub.Payloads.Playback;
+using TwitchStreamsVkNotifications.Work.Check;
+using TwitchStreamsVkNotifications.Work.Check.Helix;
+using TwitchStreamsVkNotifications.Work.Check.Pubsub;
 
 namespace TwitchStreamsVkNotifications.Work;
 
 /// <summary>
-/// Создаёт клиент пабсаба, который и даёт нам информацию о том, что стрим запустился.
+/// Следит за появлением стримов.
 /// Тут же и отправляется информация в вк.
 /// </summary>
-public class TwitchChecker : IDisposable
+public class TwitchChecker : IHostedService
 {
     readonly IOptions<MyOptions> options;
     readonly IServiceScopeFactory serviceScopeFactory;
     readonly ILogger logger;
 
-    bool started = false;
-
-    readonly TwitchPubsubClient pubsubClient;
-
     bool lastOnline = false;
     DateTime? lastUpdate = null;
 
-    public TwitchChecker(IOptions<MyOptions> options, IServiceScopeFactory serviceScopeFactory, ILoggerFactory loggerFactory)
+    public TwitchChecker(IEnumerable<ITwitchChecker> checkers, IOptions<MyOptions> options, IServiceScopeFactory serviceScopeFactory, ILoggerFactory loggerFactory)
     {
         this.options = options;
         this.serviceScopeFactory = serviceScopeFactory;
         this.logger = loggerFactory.CreateLogger(this.GetType());
 
-        pubsubClient = new TwitchPubsubClient(new TwitchPubsubClientOpts()
+        foreach (var checker in checkers)
         {
-        }, loggerFactory);
-        pubsubClient.Connected += ClientConnected;
-        pubsubClient.ConnectionClosed += ClientConnectionClosed;
-
-        var topic = pubsubClient.AddPlaybackTopic(options.Value.TwitchChannelId);
-        topic.DataReceived = PlaybackReceived;
+            checker.ChannelChecked += ChannelChecked;
+        }
     }
 
-    public void Init()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (started)
-            return;
-
-        started = true;
-
-        pubsubClient.ConnectAsync();
+        return Task.CompletedTask;
     }
 
-    private async void PlaybackReceived(PlaybackData data)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    private async void ChannelChecked(object? sender, TwitchCheckInfo info)
     {
         try
         {
-            if (data.Type == "stream-up")
+            if (info.online)
             {
-                logger.LogInformation("Стрим поднялся.");
+                logger.LogInformation("Стрим поднялся. {name}", sender?.GetType().Name);
 
                 if (!lastOnline && (lastUpdate == null || DateTime.UtcNow - lastUpdate.Value > options.Value.ReplayCooldown))
                 {
+                    // Если придёт несколько ивентов, ожидание поста может задержать обновление ластапдейта.
+                    lastUpdate = DateTime.UtcNow;
+                    lastOnline = true;
+
                     using var scope = serviceScopeFactory.CreateScope();
 
                     var poster = scope.ServiceProvider.GetRequiredService<VkPoster>();
                     await poster.PostAsync();
                 }
-
-                lastUpdate = DateTime.UtcNow;
-                lastOnline = true;
+                else
+                {
+                    lastUpdate = DateTime.UtcNow;
+                    lastOnline = true;
+                }
             }
-            else if (data.Type == "stream-down")
+            else
             {
-                logger.LogInformation("Стрим опустился.");
+                logger.LogInformation("Стрим опустился. {name}", sender?.GetType().Name);
 
                 lastUpdate = DateTime.UtcNow;
                 lastOnline = false;
             }
-            else return;
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при обработке информации.");
+            logger.LogError(e, "Ошибка при обработке информации. {name}", sender?.GetType().Name);
         }
-    }
-
-    private void ClientConnected()
-    {
-        logger.LogInformation("Клиент присоединился.");
-    }
-
-    private void ClientConnectionClosed(Exception? exception)
-    {
-        logger.LogInformation("Клиент потерял соединение. {message}", exception?.Message);
-    }
-
-    public void Dispose()
-    {
-        pubsubClient.Close();
     }
 }
