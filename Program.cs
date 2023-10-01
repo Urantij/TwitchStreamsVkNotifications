@@ -86,6 +86,12 @@ using (var scope = app.Services.CreateScope())
         var vk = scope.ServiceProvider.GetRequiredService<VkPoster>();
         await vk.PostAsync();
     }
+
+    if (args.Contains("--ignore"))
+    {
+        var vk = scope.ServiceProvider.GetRequiredService<VkPoster>();
+        vk.DoIgnoreNextOnline();
+    }
 }
 
 app.Run();
