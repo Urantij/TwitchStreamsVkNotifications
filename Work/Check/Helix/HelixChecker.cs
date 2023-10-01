@@ -34,7 +34,7 @@ public class HelixChecker : BackgroundService, ITwitchChecker
     {
         logger.LogInformation("Начинаем.");
 
-        await Task.Run(CheckChannelAsync);
+        await Task.Run(CheckLoopAsync);
     }
 
     async Task CheckLoopAsync()
