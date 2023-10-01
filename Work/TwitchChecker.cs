@@ -52,10 +52,10 @@ public class TwitchChecker : IHostedService
         {
             if (info.online)
             {
-                logger.LogInformation("Стрим поднялся. {name}", sender?.GetType().Name);
-
                 if (!lastOnline && (lastUpdate == null || DateTime.UtcNow - lastUpdate.Value > options.Value.ReplayCooldown))
                 {
+                    logger.LogInformation("Стрим поднялся. {name}", sender?.GetType().Name);
+
                     // Если придёт несколько ивентов, ожидание поста может задержать обновление ластапдейта.
                     lastUpdate = DateTime.UtcNow;
                     lastOnline = true;
@@ -73,7 +73,10 @@ public class TwitchChecker : IHostedService
             }
             else
             {
-                logger.LogInformation("Стрим опустился. {name}", sender?.GetType().Name);
+                if (lastOnline)
+                {
+                    logger.LogInformation("Стрим опустился. {name}", sender?.GetType().Name);
+                }
 
                 lastUpdate = DateTime.UtcNow;
                 lastOnline = false;

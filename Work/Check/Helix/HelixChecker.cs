@@ -32,7 +32,7 @@ public class HelixChecker : BackgroundService, ITwitchChecker
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Начинаем.");
+        logger.LogInformation("Начинаем. Частота обновлений {time}", config.HelixCheckDelay);
 
         await Task.Run(CheckLoopAsync);
     }
@@ -61,6 +61,8 @@ public class HelixChecker : BackgroundService, ITwitchChecker
 
             await Task.Delay(config.HelixCheckDelay);
         }
+
+        logger.LogInformation("Закончили.");
     }
 
     /// <returns>null, если ошибка внеплановая</returns>
