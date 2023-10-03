@@ -46,7 +46,11 @@ public class HelixChecker : BackgroundService, ITwitchChecker
             // Если ошибка, стоит подождать чуть больше обычного.
             if (checkInfo == null)
             {
-                await Task.Delay(config.HelixCheckDelay.Multiply(1.5));
+                try
+                {
+                    await Task.Delay(config.HelixCheckDelay.Multiply(1.5), lifetime.ApplicationStopping);
+                }
+                catch { return; }
                 continue;
             }
 
@@ -59,7 +63,11 @@ public class HelixChecker : BackgroundService, ITwitchChecker
                 logger.LogError(e, $"{nameof(CheckLoopAsync)}");
             }
 
-            await Task.Delay(config.HelixCheckDelay);
+            try
+            {
+                await Task.Delay(config.HelixCheckDelay, lifetime.ApplicationStopping);
+            }
+            catch { return; }
         }
 
         logger.LogInformation("Закончили.");

@@ -16,13 +16,13 @@ public class PubsubChecker : ITwitchChecker, IHostedService, IDisposable
 
     public event EventHandler<TwitchCheckInfo>? ChannelChecked;
 
-    public PubsubChecker(IOptions<MyOptions> options, ILogger<PubsubChecker> logger, ILoggerFactory loggerFactory)
+    public PubsubChecker(IOptions<MyOptions> options, IHostApplicationLifetime lifetime, ILogger<PubsubChecker> logger, ILoggerFactory loggerFactory)
     {
         this.logger = logger;
 
         client = new TwitchPubsubClient(new TwitchPubsubClientOpts()
         {
-        }, loggerFactory);
+        }, loggerFactory, lifetime.ApplicationStopping);
         client.Connected += ClientConnected;
         client.ConnectionClosed += ClientConnectionClosed;
 
