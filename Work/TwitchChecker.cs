@@ -22,7 +22,7 @@ public class TwitchChecker : IHostedService
     readonly ILogger logger;
 
     bool lastOnline = false;
-    DateTime? lastUpdate = null;
+    DateTime? lastChange = null;
 
     public TwitchChecker(IEnumerable<ITwitchChecker> checkers, IOptions<MyOptions> options, IServiceScopeFactory serviceScopeFactory, ILoggerFactory loggerFactory)
     {
@@ -52,23 +52,22 @@ public class TwitchChecker : IHostedService
         {
             if (info.online)
             {
-                if (!lastOnline && (lastUpdate == null || DateTime.UtcNow - lastUpdate.Value > options.Value.ReplayCooldown))
+                if (!lastOnline)
                 {
                     logger.LogInformation("Стрим поднялся. {name}", sender?.GetType().Name);
 
-                    // Если придёт несколько ивентов, ожидание поста может задержать обновление ластапдейта.
-                    lastUpdate = DateTime.UtcNow;
+                    // Если придёт несколько ивентов, ожидание поста может задержать обновление ластченжа.
+                    bool send = lastChange == null || DateTime.UtcNow - lastChange.Value > options.Value.ReplayCooldown;
+                    lastChange = DateTime.UtcNow;
                     lastOnline = true;
 
-                    using var scope = serviceScopeFactory.CreateScope();
+                    if (send)
+                    {
+                        using var scope = serviceScopeFactory.CreateScope();
 
-                    var poster = scope.ServiceProvider.GetRequiredService<VkPoster>();
-                    await poster.PostAsync();
-                }
-                else
-                {
-                    lastUpdate = DateTime.UtcNow;
-                    lastOnline = true;
+                        var poster = scope.ServiceProvider.GetRequiredService<VkPoster>();
+                        await poster.PostAsync();
+                    }
                 }
             }
             else
@@ -76,10 +75,10 @@ public class TwitchChecker : IHostedService
                 if (lastOnline)
                 {
                     logger.LogInformation("Стрим опустился. {name}", sender?.GetType().Name);
-                }
 
-                lastUpdate = DateTime.UtcNow;
-                lastOnline = false;
+                    lastChange = DateTime.UtcNow;
+                    lastOnline = false;
+                }
             }
         }
         catch (Exception e)
