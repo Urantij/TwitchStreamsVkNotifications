@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchStreamsVkNotifications", "TwitchStreamsVkNotifications\TwitchStreamsVkNotifications.csproj", "{BCFF5D58-6E69-4245-8C3A-6313973CB42B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCFF5D58-6E69-4245-8C3A-6313973CB42B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCFF5D58-6E69-4245-8C3A-6313973CB42B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCFF5D58-6E69-4245-8C3A-6313973CB42B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFF5D58-6E69-4245-8C3A-6313973CB42B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
