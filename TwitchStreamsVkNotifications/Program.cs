@@ -73,11 +73,15 @@ builder.Logging.AddSimpleConsole(c =>
     c.TimestampFormat = "[HH:mm:ss] ";
 });
 
-builder.Services.AddRazorPages();
+bool noWeb = args.Contains("--no-web"); 
+
+if (!noWeb)
+    builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-app.MapRazorPages();
+if (!noWeb)
+    app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
